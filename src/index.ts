@@ -4,7 +4,9 @@ import sequelize from './config/database';
 import usersRoutes from './routes/userRoutes';
 import authRoutes from './routes/authRoute';
 import blogRoutes from './routes/blogRoutes'
+import quizRoute from './routes/quizRoute'
 import { errorHandler } from './middleware/errorHandler';
+
 
 //swagger
 import swaggerUi from "swagger-ui-express";
@@ -26,6 +28,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerOutput));
 app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
 app.use('/blog', blogRoutes);
+app.use('/quiz',quizRoute)
 
 // Error handling middleware
 app.use(errorHandler);
