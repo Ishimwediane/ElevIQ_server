@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 
 interface JwtPayload {
@@ -13,11 +13,12 @@ export interface AuthRequest extends Request {
   user?: JwtPayload;
 }
 
-export const authenticated = (
-  req: AuthRequest,
+// Cast to RequestHandler to satisfy Express type expectations
+export const authenticated: RequestHandler = (
+  req: Request,
   res: Response,
   next: NextFunction
-): void => {
+) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(' ')[1];
   
@@ -28,9 +29,9 @@ export const authenticated = (
   
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    req.user = decoded;
+    (req as AuthRequest).user = decoded;
     next();
   } catch (err) {
-    res.status(403).json({ message: 'Token is expired or inavalid' });
+    res.status(403).json({ message: 'Token is expired or invalid' });
   }
 };
