@@ -9,6 +9,10 @@ interface QuestionRecordAttributes {
   correctAnswer: string;
   userAnswer?: string;
   isCorrect?: boolean;
+  optionA?: string;
+  optionB?: string;
+  optionC?: string;
+  optionD?: string;
   imageUrl?: string;
   altText?: string;
   responseTime?: number;
@@ -19,7 +23,19 @@ interface QuestionRecordAttributes {
 
 type QuestionRecordCreationAttributes = Optional<
   QuestionRecordAttributes,
-  'id' | 'userAnswer' | 'isCorrect' | 'imageUrl' | 'altText' | 'responseTime' | 'explanation' | 'topic' | 'difficulty'
+  | 'id'
+  | 'userAnswer'
+  | 'isCorrect'
+  | 'optionA'
+  | 'optionB'
+  | 'optionC'
+  | 'optionD'
+  | 'imageUrl'
+  | 'altText'
+  | 'responseTime'
+  | 'explanation'
+  | 'topic'
+  | 'difficulty'
 >;
 
 class QuestionRecord
@@ -32,6 +48,10 @@ class QuestionRecord
   public correctAnswer!: string;
   public userAnswer!: string;
   public isCorrect!: boolean;
+  public optionA!: string;
+  public optionB!: string;
+  public optionC!: string;
+  public optionD!: string;
   public imageUrl!: string;
   public altText!: string;
   public responseTime!: number;
@@ -42,7 +62,7 @@ class QuestionRecord
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  static associate:()=>void
+  static associate: () => void;
 }
 
 QuestionRecord.init(
@@ -52,6 +72,12 @@ QuestionRecord.init(
     correctAnswer: { type: DataTypes.STRING, allowNull: false },
     userAnswer: { type: DataTypes.STRING },
     isCorrect: { type: DataTypes.BOOLEAN },
+
+    optionA: { type: DataTypes.STRING },
+    optionB: { type: DataTypes.STRING },
+    optionC: { type: DataTypes.STRING },
+    optionD: { type: DataTypes.STRING },
+
     imageUrl: { type: DataTypes.STRING },
     altText: { type: DataTypes.STRING },
     responseTime: { type: DataTypes.INTEGER },
@@ -68,7 +94,6 @@ QuestionRecord.init(
     tableName: 'QuestionRecords',
   }
 );
-
 
 QuestionRecord.associate = () => {
   QuestionRecord.belongsTo(QuizSession, { foreignKey: 'sessionId' });

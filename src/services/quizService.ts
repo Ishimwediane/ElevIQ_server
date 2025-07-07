@@ -4,6 +4,7 @@ import QuestionRecord from '../models/QuestionRecord';
 import ReviewQueue from '../models/ReviewQueue';
 import Badge from '../models/Badge';
 import UserBadge from '../models/UserBadge';
+import { generateQuestionsWithAI } from '../lib/gemini';
 
 interface GenerateQuizParams {
   userId: number;
@@ -13,11 +14,11 @@ interface GenerateQuizParams {
 }
 
 class QuizService {
-  // Create a new quiz session and generate questions (mock example)
+  // Create a new quiz session and generate AI-powered questions
   static async generateQuiz(params: GenerateQuizParams) {
     const { userId, subject, difficulty, reviewIds } = params;
 
-    // Create quiz session
+    // 1. Create quiz session
     const session = await QuizSession.create({
       userId,
       subject,
@@ -25,27 +26,28 @@ class QuizService {
       startedAt: new Date(),
     });
 
-    // TODO: Call AI to generate questions based on subject & difficulty
-    // For now, return mock questions
-    const questions = [
-      {
-        questionText: `Sample question on ${subject} (${difficulty})`,
-        correctAnswer: 'Answer 1',
-        topic: subject,
-        difficulty,
-      },
-      // Add more questions...
-    ];
+    // 2. Call Gemini to generate questions
+    const questions = await generateQuestionsWithAI({
+      subject,
+      difficulty,
+      count: 5,
+    });
 
-    // Save question records linked to session (but without userAnswer yet)
+    // 3. Save questions to DB
     const questionRecords = await Promise.all(
-      questions.map((q) =>
+      questions.map((q: any) =>
         QuestionRecord.create({
           sessionId: session.id,
           questionText: q.questionText,
           correctAnswer: q.correctAnswer,
-          topic: q.topic,
-          difficulty: q.difficulty,
+          optionA: q.options?.A,
+          optionB: q.options?.B,
+          optionC: q.options?.C,
+          optionD: q.options?.D,
+          topic: q.topic || subject,
+          difficulty,
+          imageUrl: q.imageUrl || null,
+          altText: q.altText || null,
         })
       )
     );
@@ -61,20 +63,23 @@ class QuizService {
     const question = await QuestionRecord.findByPk(questionId);
     if (!question) throw new Error('Question not found');
 
-    const correct = question.correctAnswer.toLowerCase() === userAnswer.toLowerCase();
+    const correct =
+      question.correctAnswer.trim().toLowerCase() === userAnswer.trim().toLowerCase();
 
-    // Update record with user answer and correctness
-    await question.update({ userAnswer, isCorrect: correct });
-
-    // TODO: Optionally call AI for explanation
+    await question.update({
+      userAnswer,
+      isCorrect: correct,
+    });
 
     return {
       correct,
-      explanation: correct ? 'Correct answer!' : `Correct answer is: ${question.correctAnswer}`,
+      explanation: correct
+        ? 'Correct answer!'
+        : `Correct answer is: ${question.correctAnswer}`,
     };
   }
 
-  // Other methods: get analytics, badges, review queue management, etc.
+  // Other methods to be added: analytics, review queue, badges, etc.
 }
 
 export default QuizService;

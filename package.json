@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "ts-node-dev --respawn src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-     "swagger": "ts-node src/swagger.ts"
+    "swagger": "ts-node src/swagger.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",

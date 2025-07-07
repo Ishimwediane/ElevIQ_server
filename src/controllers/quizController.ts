@@ -1,11 +1,13 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import QuizService from '../services/quizService';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 const QuizController = {
   // POST /quiz/generate
-  generateQuiz: async (req: Request, res: Response): Promise<void> => {
+  generateQuiz: async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-      const { userId, subject, difficulty, reviewIds } = req.body;
+      const userId = req.user?.id;
+      const { subject, difficulty, reviewIds } = req.body;
 
       if (!userId || !subject || !difficulty) {
         res.status(400).json({ message: 'Missing required fields' });
@@ -27,7 +29,7 @@ const QuizController = {
   },
 
   // POST /quiz/evaluate
-  evaluateAnswer: async (req: Request, res: Response): Promise<void> => {
+  evaluateAnswer: async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { questionId, userAnswer } = req.body;
 
