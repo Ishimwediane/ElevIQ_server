@@ -39,17 +39,20 @@ router.get(
   (req, res) => {
     const user = req.user as any;
 
-    // Issue JWT
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET!,
       { expiresIn: '1d' }
     );
 
-    // Send token as JSON or redirect to frontend with token
-    res.json({ token, message: 'Google login successful' });
+    // Redirect to frontend with token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(`${frontendUrl}/quiz?token=${token}`);
   }
 );
+
+
+
 
 
 export default router;

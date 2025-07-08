@@ -6,6 +6,8 @@ import authRoutes from './routes/authRoute';
 
 import quizRoute from './routes/quizRoute'
 import { errorHandler } from './middleware/errorHandler';
+import cors from 'cors';
+
 
 
 //swagger
@@ -15,7 +17,10 @@ import swaggerOutput from "./swagger_output.json";
 
 dotenv.config();
 const app = express();
-
+app.use(cors({
+  origin: 'http://localhost:3000', // frontend origin
+  credentials: true, // needed if using cookies
+}));
 //Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -34,6 +39,7 @@ app.use('/quiz',quizRoute)
 app.use(errorHandler);
 
 //app.use('/api/blogs', blogRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 sequelize.sync({force:true}).then(() => {
